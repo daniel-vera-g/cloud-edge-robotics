@@ -1,0 +1,81 @@
+\documentclass[runningheads]{llncs}
+
+%---- Sonderzeichen-------%
+\usepackage[ngerman]{babel}
+%---- Codierung----%
+\usepackage[utf8]{inputenc}
+%\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{llncsdoc}
+%----- Mathematischer Zeichenvorrat---%
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumerate}
+% fuer die aktuelle Zeit
+\usepackage{scrtime}
+\usepackage{listings}
+\usepackage{subfigure}
+\usepackage{hyperref}
+\usepackage{lipsum}
+
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+
+% -- CUSTOM ADDITIONS --
+
+%% Use glossaries (optional)
+\makeglossaries
+% %% Load glossary definitions from file
+\loadglsentries{glossentries.tex}
+
+% Proper Table line breaks
+\usepackage{tabularx}
+% Syntax highlighting
+\usepackage{listings}
+
+% -- END CUSTOM ADDITIONS --
+
+% -------------------------------------------------------------------------------------------------
+% -------------------------------------------------------------------------------------------------
+\begin{document}
+
+\mainmatter
+\title{Cloud und Edge Robotics}
+\titlerunning{Cloud und Edge Robotics}
+\author{Daniel Vera Gilliard}
+\authorrunning{Vertiefungsseminar Internet of Things}
+\institute{Betreuer: Prof. Dr. rer. nat. Christian Zirpins}
+\date{22.11.2022}
+\maketitle
+
+% -------------------------------------------------------------------------------------------------
+
+\begin{abstract}
+  Das Thema Cloud und Edge Robotics umfasst Themenbereiche rund um die Robotik Systeme, dem Edge Layer und der Cloud. Daraus ergeben sich interessante Use Cases und Herausforderungen die in dieser Arbeit untersucht werden. Das Ziel in der vorliegenden Seminararbeit ist es, eine Auswahl an Konzepten und Technologien im Edge und Cloud Robotics Bereich vorzustellen und zu bewerten. Dazu wird auf deren Eigenschaften in Bezug auf den Robotics Bereich eingegangen und beispielhafte Use Cases vorgestellt. Als Grundlage, wurden dabei relevante Wissenschaftliche Arbeiten sowie aktuelle Technologien ausgewertet. Daraus stellten sich das \acrfull{ros2} mit dem \acrfull{dds}, so wie das Netzwerkprotokoll Zenoh als wichtige Werkzeuge um das Konzept des \acrlong{cttc} zu realisieren. Zenoh ermöglicht dabei eine performante und skalierbare Kommunikation zwischen Robotern dem Edge und der Cloud. Die vorgestellten Technologien ergeben ein großes Potential, um Robotik Projekte einfacher mit der Edge und Cloud zu integrieren. Durch die schnelllebige Entwicklung rund um die Cloud und das Edge Robotics Thema, empfiehlt es sich jedoch weitere sich noch in der Entwicklung befindliche Technologien mitzuverfolgen. 
+\end{abstract}
+
+% -------------------------------------------------------------------------------------------------
+
+\input{sections/einleitung}
+
+% -------------------------------------------------------------------------------------------------
+
+\input{sections/grundlagen}
+
+% -------------------------------------------------------------------------------------------------
+
+\input{sections/hauptteil}
+
+% -------------------------------------------------------------------------------------------------
+
+\input{sections/fazit}
+
+% -------------------------------------------------------------------------------------------------
+
+% Normaler LNCS Zitierstil
+\bibliographystyle{splncs04} % CUSTOM ADDITION OF BIBLIOGRAPHY STYLE
+\bibliography{literatur}
+
+\end{document}

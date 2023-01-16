@@ -1,0 +1,80 @@
+\subsection{Kommunikationsprotokolle} % (fold)
+\label{sub:Kommunikationsprotokolle}
+
+Das verwendete Kommunikationsprotokoll ist in der Robotik ein wichtiger Faktor für die Performance und Skalierung der Anwendungen. In \cite{jawharNetworkingMultiRobotSystems2018} wurden dabei verschiedene Protokolle untersucht und bewertet. Wie schon im Abschnitt \ref{sub:Cloud-To-Thing-Continuum} erwähnt, hat man hier jedoch durch die vielen Protokollen einen hohen Aufwand. Die Autoren beschreiben im Paper zusätzlich weitere Hürden die man für Kommunikationsprotokolle im Cloud und Edge Robotics berücksichtigen sollte:
+
+\begin{enumerate}
+  \item Die Anzahl der Roboter: Kommunikationsprotokolle müssen bei einer Hohen Anzahl an Robotern skalierbar bleiben und externe Netze unterstützen.
+  \item Rechen und Speicherleistung: Je nach Anwendungsfall muss die Rechen und Speicherleistung des Clients berücksichtigt werden. Einfache Roboter zum Beispiel, brauchen ein leichtgewichtiges Protokoll.
+  \item Energieeffizienz: Vor allem Roboter nutzen oftmals eine Battery als Energiequelle. Da diese nur eine beschränkte Kapazität haben, sollte Energieeffizienz ein wichtiger Stellenwert im Protokoll haben. Hier wäre es hilfreich, wenn das Protokoll je nach Zustand des Roboters die Energieeffizienz anpassen könnte. Bei Zeitkritischen Anwendungen müssen öfter Netzwerkanfragen gemacht werden als bei einfachen Anwendungen.
+  \item Netzwerkdurchsatz: Da man nicht immer mit optimalen Netzen rechnen kann, sollte das Protokoll diese auch unterstützen. Hier müssen vor allem Paketverluste, Störungen und Verzögerungen miteinbezogen werden.
+  \item Weiterleitung und Übergabe: Hiermit ist die Weiterleitung und Übergabe von Clients an verschiedene Router zwischen Netzen gemeint. Da Clients, wie zum Beispiel Roboter, sehr beweglich sein können, muss man der Übergang in verschiedene Netze reibungslos laufen können.
+\end{enumerate}
+
+Im Fall der Robotik Systeme, ist es wichtig ein simples Protokoll zu haben welches von den meisten Roboter unterstützt wird. Die erste Version von ROS nutzte dabei TCPROS/UDPROS \cite{maruyamaExploringPerformanceROS22016}. Ein auf dem TCP und UDP basiertes Kommunikationsprotokoll. Da dieses, wie schon erwähnt einen zentralen Master Prozess vorausgesetzt hat, ist man für die zweite Version auf den dezentralen \acrlong{dds} umgestiegen. Bei der Nutzung außerhalb der Robotik oder im Kontext des \acrlong{cttc} stößt das \acrlong{dds} jedoch auf seine Grenzen. Die zum aktuellen Zeitpunkt passendste Lösung ist das Zenoh Protokoll.\\
+Im folgenden Abschnitt wird zu erst das \acrlong{dds} vorgestellt. Daraufhin wird auf das Zenoh Protokoll, dessen Eigenschaften und Benutzung eingegangen.
+
+\subsubsection{Data Distribution Service} % (fold)
+\label{ssub:Data Distribution Service}
+
+Der Data Distribution Service, nachfolgend DDS genannt, ist das Transportprotokoll welches in ROS2 genutzt wird \cite{ConceptsROSDocumentation}. Dieses ermöglicht verschiedene Konfigurationsmöglichkeiten und bietet eine erhöhte Stabilität gegenüber der Kommunikation in ROS. Außerdem abstrahiert es die Schnittstellen für den Nutzer und basiert auf einen verlässlichen Pub/Sub Mechanismus \cite{maruyamaExploringPerformanceROS22016}. Vom \acrlong{dds} gibt es dabei mehrere Implementierungen, so dass es wie eine art Middleware agiert. Man kann also verschiedene DDS Implementierungen nutzen oder diese mit einem externen Protokoll, wie Zenoh, kombinieren.\\
+Eine Hauptkomponente von DDS ist die Data-Centric Publish-Subscribe Komponente, nachfolgend DCPS genannt. Diese realisiert den effizienten Datentransport zwischen den heterogenen Prozessen, die alle innerhalb einer gemeinsamen Domäne kommunizieren. Ein wichtiger Bestandteil des DCPS sind die Parametern die man in der Quality-of-Service Policy, nachfolgend QoS genannt, setzen kann. Diese können das Transportverhalten beeinflussen und sind in der offiziellen Spezifikation des Data Distribution Service definiert \cite{DataDistributionService}. Die im Bezug auf die Kommunikation zu den Edge und Cloud Servern relevanten Policies sind in \ref{tab:qos} dargestellt.
+
+\begin{table}
+  \caption{DDS QoS Policies\cite{maruyamaExploringPerformanceROS22016}}
+  \label{tab:qos}
+  \begin{center}
+    \begin{tabularx}{\textwidth}{lX}    % Old: \begin{tabular}[c]{l|l}
+      \hline
+      \multicolumn{1}{c|}{\textbf{Policy}} & 
+      \multicolumn{1}{c}{\textbf{Beschreibung}} \\
+      \hline
+      DEADLINE & Es muss ein Update sowohl auf der Schreib sowie auf der Lese Seite innerhalb eines bestimmten Zeitraumes geschehen. Dies ist besonders hilfreich im Kontext des Durchsatzes um sicher zu gehen, dass die jeweiligen Nachrichten ankommen. \\
+      RELIABILITY & Hiermit kann angegeben werden wie zuverlässig die Kommunikation sein muss. Mit der Konfiguration \code{BEST\_EFFORT} werden die Daten am schnellsten gesendet, wobei Teile bei schlechter Verbindung verloren gehen können. Mit der \code{RELIABLE} Option ist die komplette Datenübertragung gesichert. Bei Verlust werden einzelne Datenpakete nachgeschickt. Hier muss man zwischen Sicherheit und Geschwindigkeit abwägen. \\
+      DURABILITY & Bei der \code{DURABILITY} Policy kann ein gewisses Caching eingestellt werden, damit später dazukommende Leser in der Message Queue ebenfalls die Nachrichten empfangen können. Dies ist im Hinblick auf den Robotics Use case sehr hilfreich, da man hier durch eine beispielsweise schlechte Konnektivität erst spät eine Verbindung aufbauen kann.\\
+      \hline
+    \end{tabularx}% 
+    % \end{tabular}
+\end{center}
+\end{table}
+
+% subsubsection Data Distribution Service (end)
+
+\subsubsection{Zenoh} % (fold)
+\label{ssub:Zenoh}
+
+Zenoh ist ein Pub/Sub Protokoll, welches ebenfalls die Eigenschaft hat Daten anzufragen oder Operationen auf entfernten Maschinen auszuführen.\\
+In Ihrer offiziellen Dokumentation, präsentieren Sie sich als Protokoll mit folgenden Eigenschaften: "[...] protocol unifying data in motion, data at rest and computations"\cite{ZenohZeroOverhead2022}. Damit stellt sich Zenoh als Schlüsseltechnik im Themenbereich des \acrlong{cttc} dar. Das \acrlong{cttc} ist dabei, wie eingangs bereits erwähnt, ein Konzept welches die Möglichkeit beschreibt Ressourcen in Form von Rechenkapazität oder Speicherplatz in einem Kontinuum zwischen einfachen Geräten wie Mikrocontroller oder Robotern hin zur Cloud oder Edge zu nutzen \cite{baldoniZenohbasedDataflowFramework2021}. Für den Cloud und Edge Robotics Bereich ist dieses Konzept sehr interessant, da es viele Themen miteinbezieht, die für die Umsetzung von Anwendungen in dem Bereich relevant sind. Zenoh schließt hier die Brücke zwischen den Robotern und der Cloud, in dem es ein einheitliches Kommunikationsmedium zum Austausch von Daten anbietet. Es müssen also nicht verschiedene Protokolle zwischen den verschiedenen Schichten genutzt werden, sondern Zenoh kann als Ende-Zu-Ende Lösung genutzt werden.
+
+\paragraph{Zenoh Protokoll} % (fold)
+\label{par:Zenoh Protokoll}
+
+Die Stärke des Zenoh Protokolls im Vergleich zu anderen Alternativen basiert auf drei Punkten \cite{baldoniZenohbasedDataflowFramework2021}. Zum einen, auf den effizienten Publish/Subscribe Mechanismus welcher unter anderem eine automatische dynamische Suche nach Knoten beinhaltet und Batching der Anfragen unterstützt. Zum anderen, durch die Möglichkeit Daten in geografisch verteilte orten zu speichern, diese gezielt abzufragen. Zuletzt, bietet Zenoh noch eine einfach definierte Semantik um Anfragen zu stellen und verschiedene Aufgaben zu aggregieren.
+
+Zenoh definiert im großen und ganzen 3 Arten von Abstraktionen\cite{ZenohZeroOverhead2022} die wichtig für die Nutzung sind.\\
+Die erste grundlegende Abstraktion ist die Darstellung von Ressourcen. Diese werden dabei in Form von Key/Value Paaren dargestellt: \code{(key, value)}. Im Robotics Kontext könnte man hier verschiedene Sensoren und dessen Daten speichern:
+
+\begin{lstlisting}
+("robot1/temperature", 23.5)
+("robot2/pressure", 1.2)
+\end{lstlisting}
+
+Eine weitere wichtige Abstraktion sind Key Expressions. Die Syntax hierfür ist die Key Expressions Language\cite{Eclipsezenoh} und ist in den RFCS des Eclipse Zenoh Projektes dokumentiert. Die wichtigsten beiden Ausdrücke sind die folgenden:
+
+\begin{enumerate}
+  \item \code{*} - Dieser Ausdruck entspricht allen Zeichen außer \code{/}. Folgender Ausdruck würde eine Subscription auf die Temperatur Sensoren aller Roboter in der Fabrik 1 und der Robotergruppe A auslösen:\\
+    \code{factory1/robotGroupA/*/temperature}
+  \item \code{**} - Dieser Ausdruck entspricht allen Zeichen inklusive \code{/}. Folgender Ausdruck würde eine Subscription auf alle Temperatur Sensoren der Fabrik 1 auslösen:\\
+    \code{factory1/**/temperature}
+\end{enumerate}
+
+Schlussendlich gibt es noch die Abstraktion der Selektoren. Diese erweitern die Key Expressions um Parameter die wie Query-Parameter bei einer URL funktionieren:\\
+\code{factory1/robotGroupA/*/temperature?measure=true\&unit=degrees}\\
+Wie man also sehen kann, fungieren Selektoren wie URLs ohne Protokoll und Hostname.\\
+Selektoren bieten dabei zwei große Anwendungsfälle in Zenoh. Zum einen, können sie verwendet werden um nicht nur nach den Schlüsseln, sondern auch nach dem Wert in einer Anfrage zu filtern. Wenn das Ziel der Zenoh Anfrage das Auslösen einer entfernten RPC-Methode ist, kann man Parameter auch nutzen, um weitere Argumente mitzugeben.
+
+% paragraph Zenoh Protokoll (end)
+
+% subsubsection Zenoh (end)
+
+% subsection Kommunikationsprotokolle (end)
