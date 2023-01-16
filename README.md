@@ -1,5 +1,7 @@
 # Cloud und Edge Robotics
 
+[![Compile](https://github.com/daniel-vera-g/cloud-edge-robotics/actions/workflows/compile.yml/badge.svg)](https://github.com/daniel-vera-g/cloud-edge-robotics/actions/workflows/compile.yml)
+
 > Paper on the Cloud and Edge Robotics
 
 - Mainly covering ROS2(DDS) and Zenoh
