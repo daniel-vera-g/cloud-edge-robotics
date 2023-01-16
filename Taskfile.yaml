@@ -1,0 +1,15 @@
+version: '3'
+
+tasks:
+  default:
+    cmds:
+      - latexmk -pdf Cloud-Edge-Robotics.tex
+
+  open:
+    deps: [default]
+    cmds:
+      - open Cloud-Edge-Robotics.pdf
+
+  clean:
+    cmds:
+      - fd -E "*.tex"  --hidden --no-ignore --glob "*Cloud-Edge-Robotics*" -x rm {}
