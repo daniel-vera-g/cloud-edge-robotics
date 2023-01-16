@@ -1,0 +1,24 @@
+name: Compile
+on: [push]
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: LaTeX Action
+        # You may pin to the exact commit or the version.
+        # uses: fudan-mse/latex-action@eb2eb7ba472011213ac0a6286fd776494623362c
+        uses: fudan-mse/latex-action@v0.0.1
+        with:
+          # The root LaTeX file to be compiled
+          root_file: Cloud-Edge-Robotics.tex
+          # Install extra packages by tlmgr
+          # extra_packages: # optional
+          # Install extra packages by apk
+          # extra_system_packages: # optional
+      - name: Save PDF
+        uses: actions/upload-artifact@v2
+        with:
+          name: Cloud-Edge-Robotics.pdf
+          path: Cloud-Edge-Robotics.pdf
